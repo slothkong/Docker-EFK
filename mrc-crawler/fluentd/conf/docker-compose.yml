@@ -1,0 +1,33 @@
+version: '2.2'
+
+services:
+  elasticsearch:
+    image: elasticsearch:latest
+    expose:
+         - 9200
+    ports:
+         - "9200:9200"
+    volumes:
+      - leandot-backup-prod:/usr/share/elasticsearch/data
+      # - leandot-backup-prod:/opt/elasticsearch/backup
+  kibana:
+    image: kibana:6.7.0
+    links:
+         - "elasticsearch"
+    ports:
+         - "5601:5601"
+    depends_on:
+      - elasticsearch
+  fluentd:
+    image: fluentd:latest
+    container_name: fluentd
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    depends_on:
+      - elasticsearch
+
+volumes:
+  leandot-backup-prod:
+    external: true
+  
