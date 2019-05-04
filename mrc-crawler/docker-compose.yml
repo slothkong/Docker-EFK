@@ -1,0 +1,39 @@
+version: '2.2'
+
+services:
+
+  elasticsearch:
+    build:
+      context: es/
+    image: elasticsearch:EFK
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+      - es-backup:/opt/elasticsearch/backup
+
+  kibana:
+    image: kibana:6.7.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
+  fluentd:
+    build:
+      context: fluentd
+    image: fluentd:EFK
+    container_name: fluentd
+    ports:
+      - 24224:24224
+    depends_on:
+      - elasticsearch
+
+volumes:
+  es-data:
+    driver: local
+  es-backup:
+    driver: local
+
